@@ -25,7 +25,8 @@ class Bayes_Classifier:
       else:
          self.poswordsfreq = self.load("positive_words.txt")
          self.negwordsfreq = self.load("negative_words.txt") 
-
+         self.total_negative = self.total_negative_words()
+         self.total_positive = self.total_positive_words()
 
       # if os.path.isfile('negative_words.txt') == False:
       #    print "training"
@@ -94,7 +95,7 @@ class Bayes_Classifier:
       pos_cond_prob = 0
       neg_cond_prob = 0
 
-      for w in self.tokenize(self,sText):
+      for w in self.tokenize(sText):
          if w.lower() not in punctuation_stopwords:
             pos_prob_word = self.poswordsfreq[w.lower()]/self.total_positive
             pos_cond_prob = pos_cond_prob + math.log10(neg_prob_word)
