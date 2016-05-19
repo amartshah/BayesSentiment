@@ -16,7 +16,8 @@ class Bayes_Classifier:
       is ready to classify input text."""
       self.poswordsfreq = dict()
       self.negwordsfreq = dict()
-
+      self.total_negative = 0
+      self.total_positive = 0
       if os.path.isfile('positive_words.txt') == False:
          self.train()
          self.save(self.poswordsfreq,"positive_words.txt")
@@ -57,8 +58,10 @@ class Bayes_Classifier:
                if w.lower() not in punctuation_stopwords:
                   if w.lower() not in self.poswordsfreq:
                      self.poswordsfreq[w.lower()] = 1
+                     self.total_positive = 1
                   else:
                      self.poswordsfreq[w.lower()]+= 1
+                     self.total_positive += 1
 
          elif sFilename[7] == '1':
             for w in self.tokenize(self.loadFile('movies_reviews/' + sFilename)):
@@ -66,17 +69,53 @@ class Bayes_Classifier:
                   print sFilename
                   if w.lower() not in self.negwordsfreq:
                      self.negwordsfreq[w.lower()] = 1
+                     self.total_negative = 1
                   else:
                      self.negwordsfreq[w.lower()]+= 1
+                     self.total_negative += 1
+                     
          print self.poswordsfreq
          print self.negwordsfreq
+         self.total_positive_words()
+         self.total_negative_words()
          return
 
-    
+   def total_positive_words(self):
+      counter = 0
+      for key in self.poswordsfreq:
+         counter = counter + self.poswordsfreq[key]
+      self.total_positive = counter
+
+   def total_negative_words(self):
+      counter = 0
+      for key in self.negwordsfreq:
+         counter = counter + self.negwordsfreq[key]
+      self.total_negative = counter
+
    def classify(self, sText):
       """Given a target string sText, this function returns the most likely document
       class to which the target string belongs (i.e., positive, negative or neutral).
       """
+      # set prior probability to 1 because corpus is biased
+      pos_cond_prob = 0
+      neg_cond_prob = 0
+
+      for w in self.tokenize(self,sText):
+         if w.lower() not in punctuation_stopwords:
+            pos_prob_word = self.poswordsfreq[w.lower()]/self.total_positive
+            pos_cond_prob = pos_cond_prob + math.log10(neg_prob_word)
+
+      for w in self.tokenize(self,sText):
+         if w.lower() not in punctuation_stopwords:
+            neg_prob_word = self.negwordsfreq[w.lower()]/self.total_negative
+            neg_cond_prob = neg_cond_prob + math.log10(neg_prob_word)
+
+      if pos_cond_prob > neg_cond_prob:
+         return "positive"
+      elif neg_cond_prob > pos_cond_prob:
+         return "negative"
+      else:
+         return "neutral"
 
    def loadFile(self, sFilename):
       """Given a file name, return the contents of the file as a string."""
