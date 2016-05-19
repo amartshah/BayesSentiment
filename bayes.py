@@ -74,12 +74,6 @@ class Bayes_Classifier:
                      self.negwordsfreq[w.lower()]+= 1
                      self.total_negative += 1
                      
-         print self.poswordsfreq
-         print self.negwordsfreq
-         self.total_positive_words()
-         self.total_negative_words()
-         return
-
    def total_positive_words(self):
       counter = 0
       for key in self.poswordsfreq:
