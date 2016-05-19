@@ -80,12 +80,14 @@ class Bayes_Classifier:
       for key in self.poswordsfreq:
          counter = counter + self.poswordsfreq[key]
       self.total_positive = counter
+      return self.total_positive
 
    def total_negative_words(self):
       counter = 0
       for key in self.negwordsfreq:
          counter = counter + self.negwordsfreq[key]
       self.total_negative = counter
+      return self.total_negative
 
    def classify(self, sText):
       """Given a target string sText, this function returns the most likely document
@@ -96,20 +98,31 @@ class Bayes_Classifier:
       neg_cond_prob = 0
 
       for w in self.tokenize(sText):
-         if w.lower() not in punctuation_stopwords:
-            pos_prob_word = self.poswordsfreq[w.lower()]/self.total_positive
-            pos_cond_prob = pos_cond_prob + math.log10(neg_prob_word)
+        if w.lower() not in punctuation_stopwords and w.lower() in self.poswordsfreq:
+            pos_prob_word = float(self.poswordsfreq[w.lower()])/self.total_positive
+            pos_cond_prob = pos_cond_prob + math.log10(pos_prob_word)
+        else:
+            pass
 
-      for w in self.tokenize(self,sText):
-         if w.lower() not in punctuation_stopwords:
-            neg_prob_word = self.negwordsfreq[w.lower()]/self.total_negative
+      for w in self.tokenize(sText):
+         print self.negwordsfreq
+         print sText
+         if w.lower() not in punctuation_stopwords and w.lower() in self.negwordsfreq:
+            neg_prob_word = float(self.negwordsfreq[w.lower()])/self.total_negative
             neg_cond_prob = neg_cond_prob + math.log10(neg_prob_word)
+         else:
+            pass
 
+      print pos_cond_prob
+      print neg_cond_prob
       if pos_cond_prob > neg_cond_prob:
+         print "pos"
          return "positive"
       elif neg_cond_prob > pos_cond_prob:
+         print "neg"
          return "negative"
       else:
+         print "neutral"
          return "neutral"
 
    def loadFile(self, sFilename):
