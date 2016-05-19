@@ -68,9 +68,6 @@ class Bayes_Classifier:
                      self.negwordsfreq[w.lower()] = 1
                   else:
                      self.negwordsfreq[w.lower()]+= 1
-         print self.poswordsfreq
-         print self.negwordsfreq
-         return
 
     
    def classify(self, sText):
