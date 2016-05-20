@@ -94,36 +94,40 @@ class Bayes_Classifier:
       class to which the target string belongs (i.e., positive, negative or neutral).
       """
       # set prior probability to 1 because corpus is biased
-      pos_cond_prob = 0
-      neg_cond_prob = 0
+      pos_cond_prob = math.log10(11129.0/(2735.0 + 11129.0))
+      neg_cond_prob = math.log10(2735.0/(2735.0 + 11129.0))
+      #number of negative files is 2735
+      #number of positive files is 11129
 
       for w in self.tokenize(sText):
-        if w.lower() not in punctuation_stopwords and w.lower() in self.poswordsfreq:
-            pos_prob_word = float(self.poswordsfreq[w.lower()])/self.total_positive
+         if w.lower() not in punctuation_stopwords and w.lower() in self.poswordsfreq:
+            pos_prob_word = float(self.poswordsfreq[w.lower()] + 1)/self.total_positive
             pos_cond_prob = pos_cond_prob + math.log10(pos_prob_word)
-        else:
-            pass
+         else:
+            pos_cond_prob += math.log10(1.0/self.total_positive)
 
       for w in self.tokenize(sText):
          print self.negwordsfreq
          print sText
          if w.lower() not in punctuation_stopwords and w.lower() in self.negwordsfreq:
-            neg_prob_word = float(self.negwordsfreq[w.lower()])/self.total_negative
+            neg_prob_word = float(self.negwordsfreq[w.lower()] + 1)/self.total_negative
             neg_cond_prob = neg_cond_prob + math.log10(neg_prob_word)
          else:
-            pass
+            neg_cond_prob += math.log10(1.0/self.total_negative)
+
 
       print pos_cond_prob
       print neg_cond_prob
-      if pos_cond_prob > neg_cond_prob:
-         print "pos"
-         return "positive"
-      elif neg_cond_prob > pos_cond_prob:
-         print "neg"
-         return "negative"
-      else:
+      if abs((pos_cond_prob-neg_cond_prob) < .5):
          print "neutral"
          return "neutral"
+      elif pos_cond_prob > neg_cond_prob:
+         print "positive"
+         return "positive"
+      elif neg_cond_prob > pos_cond_prob:
+         print "negative"
+         return "negative"
+
 
    def loadFile(self, sFilename):
       """Given a file name, return the contents of the file as a string."""
