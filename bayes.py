@@ -177,7 +177,7 @@ class Bayes_Classifier:
       """Given a target string sText, this function returns the most likely document
       class to which the target string belongs (i.e., positive, negative or neutral).
       """
-      # set prior probability to 1 because corpus is biased
+      # set prior probability to
       pos_cond_prob = math.log10(11129.0/(2735.0 + 11129.0))
       neg_cond_prob = math.log10(2735.0/(2735.0 + 11129.0))
       #number of negative files is 2735
