@@ -19,7 +19,11 @@ class Bayes_Classifier:
       self.total_negative = 0
       self.total_positive = 0
       if os.path.isfile('positive_words.txt') == False:
-         self.train()
+         lFileList = []
+         for fFileObj in os.walk("movies_reviews/"):
+            lFileList = fFileObj[2]
+            break
+         self.train(lFileList)
          self.save(self.poswordsfreq,"positive_words.txt")
          self.save(self.negwordsfreq,"negative_words.txt")
       else:
@@ -28,13 +32,6 @@ class Bayes_Classifier:
          self.total_negative = self.total_negative_words()
          self.total_positive = self.total_positive_words()
 
-      # if os.path.isfile('negative_words.txt') == False:
-      #    print "training"
-      #    self.train()
-      #    self.save(self.negwordsfreq,"negative_words.txt")
-      # else:
-      #    self.negwordsfreq = self.load("negative_words.txt") 
-
    def loop_files(self):
       lFileList = []
       for fFileObj in os.walk("reviews/"):
@@ -42,14 +39,24 @@ class Bayes_Classifier:
          break
       return lFileList
 
-   def train(self):   
+   def total_positive_words(self):
+      counter = 0
+      for key in self.poswordsfreq:
+         counter = counter + self.poswordsfreq[key]
+      self.total_positive = counter
+      return self.total_positive
+
+   def total_negative_words(self):
+      counter = 0
+      for key in self.negwordsfreq:
+         counter = counter + self.negwordsfreq[key]
+      self.total_negative = counter
+      return self.total_negative
+
+   def train(self, lFileList):   
       """Trains the Naive Bayes Sentiment Classifier."""
       # lFileList = self.loop_files()
 
-      lFileList = []
-      for fFileObj in os.walk("movies_reviews/"):
-         lFileList = fFileObj[2]
-         break
 
       #flag will be -1 for a negative word
       #flag will be 1 for a positive word
@@ -102,76 +109,96 @@ class Bayes_Classifier:
                   else:
                      self.negwordsfreq[w.lower()]+= 1
                      self.total_negative += 1
-   
 
-   def total_positive_words(self):
-      counter = 0
-      for key in self.poswordsfreq:
-         counter = counter + self.poswordsfreq[key]
-      self.total_positive = counter
-      return self.total_positive
-
-   def total_negative_words(self):
-      counter = 0
-      for key in self.negwordsfreq:
-         counter = counter + self.negwordsfreq[key]
-      self.total_negative = counter
-      return self.total_negative
-
-   def cross_validation(self, nfold):
+   def cross_validation(self):
       all_files = self.loop_files()
-      portion = len(all_files)/nfold #finding a tenth (or n-th) of the data to keep as testing
+      portion = len(all_files)/10 #finding a tenth (or n-th) of the data to keep as testing
+      #portion is the size of each faction
+      starting_index = 0
+
+      for i in range(0,10):
+         test_set = []
+         false_positive = 0
+         false_negative = 0
+         true_positive = 0
+         true_negative = 0
+         for i in range(0, portion):
+            test_set.append(all_files[starting_index + i])
+          
+         starting_index = starting_index + portion
+         training_set = all_files - test_set
+         self.train(training_set)
+
+         for sFilename in training_set:
+            file = self.loadFile('movies_reviews/' + sFilename)
+            verdict = classify(file)
+
+            if verdict == 'negative':
+               if sFilename[7] == '1':
+                  true_negative = true_negative + 1
+            else:
+               false_negative = false_negative + 1
+
+            if verdict == 'positive':
+               if sFilename[7] == '1':
+                  true_positive = true_positive + 1
+               else:
+                  false_positive = false_positive + 1
+	
 
 
 
-      #still need to account for the remainder when divided by 10
-
-      for i in range(nfold):
-         if i == nfold-1:
-            test = all_files[i*portion:] # test files from the last set, ranging from starting position of the portion to the end of the set
-                                         # this absorbs the remainder
-            train = all_files[:i*portion] # train files all files before the test set
-
-         elif i == 0:
-            test = all_files[i*portion:(i+1)*portion] #setting the test portion from next set of length portion
-            train = all_files[portion+1:] # setting train set to be everything after the first portion test set
-
-         else:
-            test = all_files[i*portion:(i+1)*portion] #setting the test portion from next set of length portion
-            train = all_files[:i*portion] + all_files[(i+1)*portion:]
-
-         self.validate(test,train)
 
 
-###REALIZED THAT WE PROBABLY DONT NEED THIS
-   def separate_pos_neg_files(self, test, train):
-      pos_train = []
-      neg_train = []
-      neutral_train = []
+              
+          
+          
+#         if i == nfold-1:
+#            test = all_files[i*portion:] # test files from the last set, ranging from starting position of the portion to the end of the set
+#                                         # this absorbs the remainder
+#            train = all_files[:i*portion] # train files all files before the test set
+#
+#         elif i == 0:
+#            test = all_files[i*portion:(i+1)*portion] #setting the test portion from next set of length portion
+#            train = all_files[portion+1:] # setting train set to be everything after the first portion test set
+#
+#         else:
+#            test = all_files[i*portion:(i+1)*portion] #setting the test portion from next set of length portion
+#            train = all_files[:i*portion] + all_files[(i+1)*portion:]
+#
+#         self.validate(test,train)
 
-      ## Separate files into positive negative and neutral train sets
 
-      for i in train:
-         if self.classify(self.loadFile(i)) == 'positive':
-            pos_train.append(i)
 
-         elif self.classify(self.loadFile(i)) = 'negative':
-            neg_train.append(i)
-
-         else:
-            neutral_train.append(i)
-
-      validate(self, test, pos_train, neg_train, neutral_train) #validate test set against train sets
-
-   def validate(self, test, train):
-      self.train2(train)
-      sentiments =[]
-      for i in test:
-         file_text = self.loadFile(i)
-         sentiments.append(self.classify(file_text))
-
-      # compare the sentiments of those files to what we already had them classified as!!
-
+####REALIZED THAT WE PROBABLY DONT NEED THIS
+#   def separate_pos_neg_files(self, test, train):
+#      pos_train = []
+#      neg_train = []
+#      neutral_train = []
+#
+#      ## Separate files into positive negative and neutral train sets
+#
+#      for i in train:
+#         if self.classify(self.loadFile(i)) == 'positive':
+#            pos_train.append(i)
+#
+#         elif self.classify(self.loadFile(i)) == 'negative':
+#            neg_train.append(i)
+#
+#         else:
+#            neutral_train.append(i)
+#
+#      validate(self, test, pos_train, neg_train, neutral_train) #validate test set against train sets
+#
+#   def validate(self, test, train):
+#      self.train2(train)
+#      sentiments =[]
+#      for i in test:
+#         file_text = self.loadFile(i)
+#         sentiments.append(self.classify(file_text))
+#
+#      # compare the sentiments of those files to what we already had them classified as!!
+#
 
    def classify(self, sText):
       """Given a target string sText, this function returns the most likely document
@@ -202,7 +229,7 @@ class Bayes_Classifier:
 
       print pos_cond_prob
       print neg_cond_prob
-      if abs((pos_cond_prob-neg_cond_prob) < .5):
+      if (abs(pos_cond_prob-neg_cond_prob) < .5):
          print "neutral"
          return "neutral"
       elif pos_cond_prob > neg_cond_prob:
