@@ -1,8 +1,8 @@
-# Name: 
-# Date:
-# Description:
-#
-#
+# Name: asf408 (Armaan Shah), snk088 (Sonia Nigam), ats545 (Amar Shah)
+# Date: 5/22/16
+# Description: Assignment 4
+# 
+# All group members were present and contributing during all work on this project.
 
 import math, os, pickle, re, nltk,copy
 punctuation_stopwords = [" ", ".", '"', ",", "?", "!", "/", "'", "-", "_", ";", ":", "&","<",">", ',"', '",', ")", "(", "://", "/"]
