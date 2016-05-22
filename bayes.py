@@ -1,8 +1,8 @@
-# Name: 
-# Date:
-# Description:
-#
-#
+# Name: asf408 (Armaan Shah), snk088 (Sonia Nigam), ats545 (Amar Shah)
+# Date: 5/22/16
+# Description: Assignment 4
+# 
+# All group members were present and contributing during all work on this project.
 
 import math, os, pickle, re
 punctuation_stopwords = [" ", ".", '"', ",", "?", "!", "/", "'", "-", "_", ";", ":", "&","<",">", ',"', '",', ")", "(", "://", "/"]
@@ -37,8 +37,8 @@ class Bayes_Classifier:
       for fFileObj in os.walk("movies_reviews/"):
          lFileList = fFileObj[2]
          break
-      print len(lFileList)
-      print "all files list length ^"
+      # print len(lFileList)
+      # print "all files list length ^"
       return lFileList
 
    def total_positive_words(self):
@@ -76,7 +76,7 @@ class Bayes_Classifier:
          elif sFilename[7] == '1':
             for w in self.tokenize(self.loadFile('movies_reviews/' + sFilename)):
                if w.lower() not in punctuation_stopwords:
-                  print sFilename
+                  # print sFilename
                   if w.lower() not in self.negwordsfreq:
                      self.negwordsfreq[w.lower()] = 1
                      self.total_negative = 1
@@ -104,7 +104,7 @@ class Bayes_Classifier:
          elif sFilename[7] == '1':
             for w in self.tokenize(self.loadFile('movies_reviews/' + sFilename)):
                if w.lower() not in punctuation_stopwords:
-                  print sFilename
+                  # print sFilename
                   if w.lower() not in self.negwordsfreq:
                      self.negwordsfreq[w.lower()] = 1
                      self.total_negative = 1
@@ -114,7 +114,7 @@ class Bayes_Classifier:
 
    def cross_validation(self):
       all_files = self.loop_files()
-      print "length" + str(len(all_files))
+      # print "length" + str(len(all_files))
       portion = len(all_files)/10 #finding a tenth (or n-th) of the data to keep as testing
       #portion is the size of each faction
       starting_index = 0
@@ -125,12 +125,16 @@ class Bayes_Classifier:
 
       for i in range(0,10):
          test_set = []
-         training_set = all_files
+         training_set = copy.deepcopy(all_files)
+         print len(all_files)
 
-         for i in range(0, portion):
-            test_set.append(all_files[starting_index + i])
+         for j in range(0, portion):
+            print starting_index
+            print j
+            print len(all_files)
+            test_set.append(all_files[starting_index + j])
 
-         print len(test_set)
+         # print len(test_set)
           
          starting_index = starting_index + portion
          for file in test_set:
@@ -154,7 +158,7 @@ class Bayes_Classifier:
                else:
                   false_positive = false_positive + 1
 
-            print false_positive, false_negative, true_positive, true_negative
+            # print false_positive, false_negative, true_positive, true_negative
 
       precision = float(true_positive)/float(true_positive+false_positive)
       recall = float(true_positive)/float(true_positive+ false_negative)
@@ -236,8 +240,8 @@ class Bayes_Classifier:
             pos_cond_prob += math.log10(1.0/self.total_positive)
 
       for w in self.tokenize(sText):
-         print self.negwordsfreq
-         print sText
+         # print self.negwordsfreq
+         # print sText
          if w.lower() not in punctuation_stopwords and w.lower() in self.negwordsfreq:
             neg_prob_word = float(self.negwordsfreq[w.lower()] + 1)/self.total_negative
             neg_cond_prob = neg_cond_prob + math.log10(neg_prob_word)
@@ -245,16 +249,16 @@ class Bayes_Classifier:
             neg_cond_prob += math.log10(1.0/self.total_negative)
 
 
-      print pos_cond_prob
-      print neg_cond_prob
+      # print pos_cond_prob
+      # print neg_cond_prob
       if (abs(pos_cond_prob-neg_cond_prob) < .5):
-         print "neutral"
+         # print "neutral"
          return "neutral"
       elif pos_cond_prob > neg_cond_prob:
-         print "positive"
+         # print "positive"
          return "positive"
       elif neg_cond_prob > pos_cond_prob:
-         print "negative"
+         # print "negative"
          return "negative"
 
 
