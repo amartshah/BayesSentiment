@@ -37,6 +37,8 @@ class Bayes_Classifier:
       for fFileObj in os.walk("reviews/"):
          lFileList = fFileObj[2]
          break
+      print len(lFileList)
+      print "all files list length ^"
       return lFileList
 
    def total_positive_words(self):
@@ -112,47 +114,62 @@ class Bayes_Classifier:
 
    def cross_validation(self):
       all_files = self.loop_files()
+      print "length" + str(len(all_files))
       portion = len(all_files)/10 #finding a tenth (or n-th) of the data to keep as testing
       #portion is the size of each faction
       starting_index = 0
+      false_positive = 0
+      false_negative = 0
+      true_positive = 0
+      true_negative = 0
 
       for i in range(0,10):
          test_set = []
-         false_positive = 0
-         false_negative = 0
-         true_positive = 0
-         true_negative = 0
+         training_set = all_files
+
          for i in range(0, portion):
             test_set.append(all_files[starting_index + i])
+
+         print len(test_set)
           
          starting_index = starting_index + portion
-         training_set = all_files - test_set
+         for file in test_set:
+            training_set.remove(file)
+
          self.train(training_set)
 
-         for sFilename in training_set:
+         for sFilename in test_set:
             file = self.loadFile('movies_reviews/' + sFilename)
             verdict = classify(file)
 
             if verdict == 'negative':
                if sFilename[7] == '1':
                   true_negative = true_negative + 1
-            else:
-               false_negative = false_negative + 1
+               else:
+                  false_negative = false_negative + 1
 
             if verdict == 'positive':
                if sFilename[7] == '1':
                   true_positive = true_positive + 1
                else:
                   false_positive = false_positive + 1
-	
 
+
+      precision = float(true_positive)/float(true_positive+false_positive)
+      recall = float(true_positive)/float(true_positive+ false_negative)
+	
+      f_measure = float(2*precision*recall)/(precision+recall)
+
+      print "precision: " + str(precision)
+      print "recall: " + str(recall)
+      print "f_measure: " + str(f_measure)
+      return precision, recall, f_measure
 
 
 
 
               
-          
-          
+
 #         if i == nfold-1:
 #            test = all_files[i*portion:] # test files from the last set, ranging from starting position of the portion to the end of the set
 #                                         # this absorbs the remainder
