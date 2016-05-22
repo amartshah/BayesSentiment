@@ -4,7 +4,7 @@
 #
 #
 
-import math, os, pickle, re, nltk
+import math, os, pickle, re, nltk,copy
 punctuation_stopwords = [" ", ".", '"', ",", "?", "!", "/", "'", "-", "_", ";", ":", "&","<",">", ',"', '",', ")", "(", "://", "/"]
 
 class Bayes_Classifier:
@@ -106,14 +106,14 @@ class Bayes_Classifier:
 
       for i in range(0,10):
          test_set = []
-         training_set = all_files
+         training_set = copy.deepcopy(all_files)
          print len(all_files)
 
          for j in range(0, portion):
-            counter = 0
             print starting_index
+            print j
+            print len(all_files)
             test_set.append(all_files[starting_index + j])
-            counter =+ 1
          
          starting_index = starting_index + portion
          for file in test_set:
@@ -176,13 +176,13 @@ class Bayes_Classifier:
       
 
       if (abs(pos_cond_prob-neg_cond_prob) < .5):
-         print "neutral"
+         # print "neutral"
          return "neutral"
       elif pos_cond_prob > neg_cond_prob:
-         print "positive"
+         # print "positive"
          return "positive"
       elif neg_cond_prob > pos_cond_prob:
-         print "negative"
+         # print "negative"
          return "negative"
 
 
