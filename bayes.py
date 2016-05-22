@@ -34,7 +34,7 @@ class Bayes_Classifier:
 
    def loop_files(self):
       lFileList = []
-      for fFileObj in os.walk("reviews/"):
+      for fFileObj in os.walk("movies_reviews/"):
          lFileList = fFileObj[2]
          break
       print len(lFileList)
@@ -140,7 +140,7 @@ class Bayes_Classifier:
 
          for sFilename in test_set:
             file = self.loadFile('movies_reviews/' + sFilename)
-            verdict = classify(file)
+            verdict = self.classify(file)
 
             if verdict == 'negative':
                if sFilename[7] == '1':
@@ -154,6 +154,7 @@ class Bayes_Classifier:
                else:
                   false_positive = false_positive + 1
 
+            print false_positive, false_negative, true_positive, true_negative
 
       precision = float(true_positive)/float(true_positive+false_positive)
       recall = float(true_positive)/float(true_positive+ false_negative)
