@@ -131,7 +131,6 @@ class Bayes_Classifier:
       false_negative = 0
       true_positive = 0
       true_negative = 0
-      print portion
 
       #iterates ten times
       for i in range(0,10):
@@ -139,14 +138,10 @@ class Bayes_Classifier:
          test_set = []
          #copy all files to initial training set list
          training_set = copy.deepcopy(all_files)
-         print len(all_files)
 
          #iterate through the next tenth of the files
          for j in range(0, portion):
             #populate the test set
-            print starting_index
-            print j
-            print len(all_files)
             test_set.append(all_files[starting_index + j])
          #increment the starting index to adjust for the next tenth
          starting_index = starting_index + portion
