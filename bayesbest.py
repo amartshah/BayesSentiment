@@ -171,7 +171,7 @@ class Bayes_Classifier:
 
             if verdict == 'positive':
                #increment true positive
-               if sFilename[7] == '1':
+               if sFilename[7] == '5':
                   true_positive = true_positive + 1
                else:
                   #increment false positive
